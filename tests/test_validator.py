@@ -1,2 +1,6 @@
+from validator import Validator
+
+
 def test_test():
-    assert True
+    validator = Validator()
+    assert validator.test() is None

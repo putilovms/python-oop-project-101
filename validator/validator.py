@@ -1,2 +1,3 @@
 class Validator():
-    pass
+    def test(self):
+        pass

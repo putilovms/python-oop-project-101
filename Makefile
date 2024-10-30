@@ -9,3 +9,11 @@ lint:
 .PHONY: test
 test:
 	poetry run pytest
+
+.PHONY: build
+build:
+	poetry build
+
+.PHONY: test-coverage
+test-coverage:
+	poetry run pytest --cov=validator --cov-report xml
