@@ -73,7 +73,7 @@ class NumberValidator(RequiredMixin, OwnValidatorsMixin):
         return self
 
     def is_valid(self, value):
-        if self.required_flag and value is None:
+        if self.required_flag and not value:
             return False
         if value is not None and not isinstance(value, int):
             return False

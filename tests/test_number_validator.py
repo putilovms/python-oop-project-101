@@ -15,6 +15,7 @@ def test_empty_number(schema):
 def test_number_required(schema):
     schema.required()
     assert schema.is_valid(None) == False
+    assert schema.is_valid(0) == False
 
 
 def test_number_int(schema):
