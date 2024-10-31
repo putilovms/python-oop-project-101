@@ -9,8 +9,28 @@ class RequiredMixin():
         return self
 
 
-class StringValidator(RequiredMixin):
+class OwnValidatorsMixin():
     def __init__(self):
+        self.own_validators = {}
+        self.tests = {}
+
+    def test(self, name, param):
+        self.tests[name] = param
+        return self
+
+    def set_own_validators(self, own_validators):
+        self.own_validators = own_validators
+
+    def is_own_valid(self, value):
+        for name, param in self.tests.items():
+            if not self.own_validators[name](value, param):
+                return False
+        return True
+
+
+class StringValidator(RequiredMixin, OwnValidatorsMixin):
+    def __init__(self):
+        super().__init__()
         self.contains_string = None
         self.min_lenght = None
 
@@ -33,11 +53,14 @@ class StringValidator(RequiredMixin):
         if self.min_lenght is not None:
             if len(value) < self.min_lenght:
                 return False
+        if not self.is_own_valid(value):
+            return False
         return True
 
 
-class NumberValidator(RequiredMixin):
+class NumberValidator(RequiredMixin, OwnValidatorsMixin):
     def __init__(self):
+        super().__init__()
         self.positive_flag = False
         self.range_value = {'min': -math.inf, 'max': math.inf}
 
@@ -62,11 +85,14 @@ class NumberValidator(RequiredMixin):
             in_range = value > min_value and value <= max_value
             if not in_range:
                 return False
+        if not self.is_own_valid(value):
+            return False
         return True
 
 
-class ListValidator(RequiredMixin):
+class ListValidator(RequiredMixin, OwnValidatorsMixin):
     def __init__(self):
+        super().__init__()
         self.sizeof_value = None
 
     def sizeof(self, value):
@@ -80,6 +106,8 @@ class ListValidator(RequiredMixin):
             return False
         sizeof = self.sizeof_value
         if sizeof is not None and len(value) < sizeof:
+            return False
+        if not self.is_own_valid(value):
             return False
         return True
 
@@ -96,14 +124,34 @@ class DictValidator():
 
 
 class Validator():
+    def __init__(self):
+        self.own_validators = {}
+
+    def add_validator(self, type, name, fn):
+        if type not in self.own_validators:
+            self.own_validators[type] = []
+        self.own_validators[type].append({name: fn})
+
+    def get_own_validators(self, type):
+        return self.own_validators.get(type, [{}])[0]
+
     def string(self):
-        return StringValidator()
+        validator = StringValidator()
+        own_validators = self.get_own_validators('string')
+        validator.set_own_validators(own_validators)
+        return validator
 
     def number(self):
-        return NumberValidator()
+        validator = NumberValidator()
+        own_validators = self.get_own_validators('number')
+        validator.set_own_validators(own_validators)
+        return validator
 
     def list(self):
-        return ListValidator()
+        validator = ListValidator()
+        own_validators = self.get_own_validators('list')
+        validator.set_own_validators(own_validators)
+        return validator
 
     def dict(self):
         return DictValidator()
