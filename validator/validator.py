@@ -18,6 +18,10 @@ class StringValidator(RequiredMixin):
         self.contains_string = string
         return self
 
+    def min_len(self, min_lenght):
+        self.min_lenght = min_lenght
+        return self
+
     def is_valid(self, value):
         if self.required_flag and not value:
             return False
@@ -31,10 +35,6 @@ class StringValidator(RequiredMixin):
                 return False
         return True
 
-    def min_len(self, min_lenght):
-        self.min_lenght = min_lenght
-        return self
-
 
 class NumberValidator(RequiredMixin):
     def __init__(self):
@@ -47,13 +47,14 @@ class NumberValidator(RequiredMixin):
 
     def range(self, min_value, max_value):
         self.range_value = {'min': min_value, 'max': max_value}
+        return self
 
     def is_valid(self, value):
         if self.required_flag and value is None:
             return False
         if value is not None and not isinstance(value, int):
             return False
-        if self.positive_flag and value < 0:
+        if value is not None and self.positive_flag and value < 0:
             return False
         if value is not None:
             min_value = self.range_value['min']
@@ -83,6 +84,17 @@ class ListValidator(RequiredMixin):
         return True
 
 
+class DictValidator():
+    def shape(self, checks):
+        self.checks = checks
+
+    def is_valid(self, values):
+        for key, value in values.items():
+            if not self.checks[key].is_valid(value):
+                return False
+        return True
+
+
 class Validator():
     def string(self):
         return StringValidator()
@@ -92,3 +104,6 @@ class Validator():
 
     def list(self):
         return ListValidator()
+
+    def dict(self):
+        return DictValidator()
