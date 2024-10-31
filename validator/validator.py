@@ -1,18 +1,16 @@
 import math
 
 
-class CommonValidator():
-    def __init__(self):
-        self.required_flag = False
+class RequiredMixin():
+    required_flag = False
 
     def required(self):
         self.required_flag = True
         return self
 
 
-class StringValidator(CommonValidator):
+class StringValidator(RequiredMixin):
     def __init__(self):
-        super().__init__()
         self.contains_string = None
         self.min_lenght = None
 
@@ -26,9 +24,11 @@ class StringValidator(CommonValidator):
         if string is not None and not isinstance(string, str):
             return False
         if self.contains_string:
-            return self.contains_string in string
+            if self.contains_string not in string:
+                return False
         if self.min_lenght is not None:
-            return len(string) >= self.min_lenght
+            if len(string) < self.min_lenght:
+                return False
         return True
 
     def min_len(self, min_lenght):
@@ -36,9 +36,8 @@ class StringValidator(CommonValidator):
         return self
 
 
-class NumberValidator(CommonValidator):
+class NumberValidator(RequiredMixin):
     def __init__(self):
-        super().__init__()
         self.positive_flag = False
         self.range_value = {'min': -math.inf, 'max': math.inf}
 
@@ -46,8 +45,8 @@ class NumberValidator(CommonValidator):
         self.positive_flag = True
         return self
 
-    def range(self, min, max):
-        self.range_value = {'min': min, 'max': max}
+    def range(self, min_value, max_value):
+        self.range_value = {'min': min_value, 'max': max_value}
 
     def is_valid(self, number):
         if self.required_flag and not number:
@@ -57,8 +56,9 @@ class NumberValidator(CommonValidator):
         if self.positive_flag and number < 0:
             return False
         if number is not None:
-            in_range = number > self.range_value['min'] \
-                and number <= self.range_value['max']
+            min_value = self.range_value['min']
+            max_value = self.range_value['max']
+            in_range = number > min_value and number <= max_value
             if not in_range:
                 return False
         return True
