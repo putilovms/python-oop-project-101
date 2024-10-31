@@ -18,16 +18,16 @@ class StringValidator(RequiredMixin):
         self.contains_string = string
         return self
 
-    def is_valid(self, string):
-        if self.required_flag and not string:
+    def is_valid(self, value):
+        if self.required_flag and not value:
             return False
-        if string is not None and not isinstance(string, str):
+        if value is not None and not isinstance(value, str):
             return False
         if self.contains_string:
-            if self.contains_string not in string:
+            if self.contains_string not in value:
                 return False
         if self.min_lenght is not None:
-            if len(string) < self.min_lenght:
+            if len(value) < self.min_lenght:
                 return False
         return True
 
@@ -48,19 +48,38 @@ class NumberValidator(RequiredMixin):
     def range(self, min_value, max_value):
         self.range_value = {'min': min_value, 'max': max_value}
 
-    def is_valid(self, number):
-        if self.required_flag and not number:
+    def is_valid(self, value):
+        if self.required_flag and value is None:
             return False
-        if number is not None and not isinstance(number, int):
+        if value is not None and not isinstance(value, int):
             return False
-        if self.positive_flag and number < 0:
+        if self.positive_flag and value < 0:
             return False
-        if number is not None:
+        if value is not None:
             min_value = self.range_value['min']
             max_value = self.range_value['max']
-            in_range = number > min_value and number <= max_value
+            in_range = value > min_value and value <= max_value
             if not in_range:
                 return False
+        return True
+
+
+class ListValidator(RequiredMixin):
+    def __init__(self):
+        self.sizeof_value = None
+
+    def sizeof(self, value):
+        self.sizeof_value = value
+        return self
+
+    def is_valid(self, value):
+        if self.required_flag and value is None:
+            return False
+        if value is not None and not isinstance(value, list):
+            return False
+        sizeof = self.sizeof_value
+        if sizeof is not None and len(value) < sizeof:
+            return False
         return True
 
 
@@ -70,3 +89,6 @@ class Validator():
 
     def number(self):
         return NumberValidator()
+
+    def list(self):
+        return ListValidator()
