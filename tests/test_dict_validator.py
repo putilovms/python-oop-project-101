@@ -10,7 +10,7 @@ def test_dict_is_valid():
         'age': v.number().positive(),
     })
 
-    assert schema.is_valid({'name': 'kolya', 'age': 100}) == True
-    assert schema.is_valid({'name': 'maya', 'age': None}) == True
-    assert schema.is_valid({'name': '', 'age': None}) == False
-    assert schema.is_valid({'name': 'ada', 'age': -5}) == False
+    assert schema.is_valid({'name': 'kolya', 'age': 100})
+    assert schema.is_valid({'name': 'maya', 'age': None})
+    assert not schema.is_valid({'name': '', 'age': None})
+    assert not schema.is_valid({'name': 'ada', 'age': -5})

@@ -9,17 +9,17 @@ def schema():
 
 
 def test_empty_list(schema):
-    assert schema.is_valid(None) == True
+    assert schema.is_valid(None)
 
 
 def test_list_required(schema):
     schema.required()
-    assert schema.is_valid(None) == False
-    assert schema.is_valid([]) == True
-    assert schema.is_valid(['hexlet']) == True
+    assert not schema.is_valid(None)
+    assert schema.is_valid([])
+    assert schema.is_valid(['hexlet'])
 
 
 def test_list_sizeof(schema):
     schema.sizeof(2)
-    assert schema.is_valid(['hexlet']) == False
-    assert schema.is_valid(['hexlet', 'code-basics']) == True
+    assert not schema.is_valid(['hexlet'])
+    assert schema.is_valid(['hexlet', 'code-basics'])
