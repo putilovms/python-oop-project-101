@@ -115,6 +115,7 @@ class ListValidator(RequiredMixin, OwnValidatorsMixin):
 class DictValidator():
     def shape(self, checks):
         self.checks = checks
+        return self
 
     def is_valid(self, values):
         for key, value in values.items():
